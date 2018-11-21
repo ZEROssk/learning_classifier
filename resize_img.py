@@ -3,11 +3,11 @@
 from PIL import Image
 import os
 
-imgNames = os.listdir("/Users/zero/Desktop/local/study_machine_learning/img/ao_seiber")
+imgNames = os.listdir("/Users/zero/Desktop/local/study_machine_learning/aka_seiber")
 
 def readImg(imgName):
     try:
-        img_src = Image.open("/Users/zero/Desktop/local/study_machine_learning/img/ao_seiber/"+ imgName)
+        img_src = Image.open("/Users/zero/Desktop/local/study_machine_learning/aka_seiber/"+ imgName)
     except:
         print("{} is not image file".format(imgName))
         img_src = 1
@@ -18,6 +18,6 @@ for imgName in imgNames:
     if img_src == 1:continue
     else:
         resizedImg = img_src.resize((256,256))
-        resizedImg.save("img/resize_ao/resize_"+imgName, quality=100)
+        resizedImg.save("img/1/resize_"+imgName, quality=100)
         print(imgName+" is resize & save")
 

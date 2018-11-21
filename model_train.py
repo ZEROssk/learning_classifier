@@ -19,10 +19,10 @@ class bake_model(chainer.Chain):
     def __init__(self):
 
         super(bake_model, self).__init__(
-            conv1 =  F.Convolution2D(3, 16, 5, pad=2),
-            conv2 =  F.Convolution2D(16, 32, 5, pad=2),
-            l3    =  F.Linear(6272, 256),
-            l4    =  F.Linear(256, 2)
+            conv1 =  L.Convolution2D(3, 16, 5, pad=2),
+            conv2 =  L.Convolution2D(16, 32, 5, pad=2),
+            l3    =  L.Linear(135200, 256),
+            l4    =  L.Linear(256, 2)
         )
 
     def clear(self):
@@ -31,11 +31,13 @@ class bake_model(chainer.Chain):
 
     def forward(self, X_data, y_data, train=True):
         self.clear() #初期化
-        X_data = chainer.Variable(np.asarray(X_data), volatile=not train)
-        y_data = chainer.Variable(np.asarray(y_data), volatile=not train)
+        # X_data = chainer.Variable(np.asarray(X_data), volatile=not train)
+        # y_data = chainer.Variable(np.asarray(y_data), volatile=not train)
+        X_data = chainer.Variable(np.asarray(X_data))
+        y_data = chainer.Variable(np.asarray(y_data))
         h = F.max_pooling_2d(F.relu(self.conv1(X_data)), ksize = 5, stride = 2, pad =2)
         h = F.max_pooling_2d(F.relu(self.conv2(h)), ksize = 5, stride = 2, pad =2)
-        h = F.dropout(F.relu(self.l3(h)), train=train)
+        h = F.dropout(F.relu(self.l3(h)))
         y = self.l4(h)
 
         return F.softmax_cross_entropy(y, y_data), F.accuracy(y, y_data)
@@ -48,12 +50,15 @@ def getDataSet():
     y_train = []
     y_test = []
 
-    for i in range(0,2):
-        path = "/Users/zero/Desktop/local/study_machine_learning/img/resize_ao/"
+    for i in range(0, 1):
+        path = "/Users/zero/Desktop/local/study_machine_learning/img/"
         imgList = os.listdir(path+str(i))
 
         imgNum = len(imgList)
         cutNum = imgNum - imgNum/5
+
+        for img in imgList:
+            print(img)
 
         for j in range(len(imgList)):
             imgSrc = cv2.imread(path+str(i)+"/"+imgList[j])
@@ -66,7 +71,7 @@ def getDataSet():
             else:
                 X_test.append(imgSrc)
                 y_test.append(i)
-        return X_train,y_train,Xtest,y_test
+    return X_train,y_train,X_test,y_test
 
 # ------train------
 
@@ -103,7 +108,8 @@ def train():
             X_batch = X_train[perm[i:i+batchNum]]
             y_batch = y_train[perm[i:i+batchNum]]
 
-            optimizer.zero_grads()
+            # optimizer.zero_grads()
+            optimizer.reallocate_cleared_grads()
             loss, acc = model.forward(X_batch, y_batch)
             loss.backward()
             optimizer.update()
