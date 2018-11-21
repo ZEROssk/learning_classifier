@@ -31,8 +31,8 @@ class bake_model(chainer.Chain):
 
     def forward(self, X_data, y_data, train=True):
         self.clear() #初期化
-        # X_data = chainer.Variable(np.asarray(X_data), volatile=not train)
-        # y_data = chainer.Variable(np.asarray(y_data), volatile=not train)
+        #X_data = chainer.Variable(np.asarray(X_data), volatile=not train)
+        #y_data = chainer.Variable(np.asarray(y_data), volatile=not train)
         X_data = chainer.Variable(np.asarray(X_data))
         y_data = chainer.Variable(np.asarray(y_data))
         h = F.max_pooling_2d(F.relu(self.conv1(X_data)), ksize = 5, stride = 2, pad =2)
@@ -56,9 +56,6 @@ def getDataSet():
 
         imgNum = len(imgList)
         cutNum = imgNum - imgNum/5
-
-        for img in imgList:
-            print(img)
 
         for j in range(len(imgList)):
             imgSrc = cv2.imread(path+str(i)+"/"+imgList[j])
@@ -93,7 +90,6 @@ def train():
     # ---train & test---
     while epoch <= epochNum:
         print("epoch: {}".format(epoch))
-        print(datetime.datetime.now())
 
         trainImgNum = len(y_train)
         testImgNum = len(y_test)
@@ -131,11 +127,11 @@ def train():
 
             sumLoss += float(loss.data) * len(y_batch)
             sumAcr += float(acc.data) * len(y_batch)
-        print('test mean loss={}, accuracy={}'.format(sumLoss / testImgNum, sumAcr / testImgNum))
+        print('test  mean loss={}, accuracy={}'.format(sumLoss / testImgNum, sumAcr / testImgNum))
         epoch += 1
 
         # ---save model---
-        S.save_hdf5('model'+str(epoch+1), model)
+        S.save_hdf5('model/model'+str(epoch), model)
 
 train()
 
