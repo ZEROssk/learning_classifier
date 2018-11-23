@@ -5,7 +5,7 @@ import os
 
 def readImg(imgName):
     try:
-        img_src = Image.open("/Users/zero/Desktop/local/study_machine_learning/img/resize_ao/" + imgName)
+        img_src = Image.open("/Users/zero/Desktop/local/study_machine_learning/img/aka_seiber/" + imgName)
         print("done")
     except:
         print("{} is not image file".format(imgName))
@@ -18,20 +18,20 @@ def spinImg(imgNames):
         if img_src == 1:continue
         else:
             tmp = img_src.transpose(Image.FLIP_TOP_BOTTOM)
-            tmp.save("img/resize_ao/flipTB_" + imgName)
+            tmp.save("data/1/flipTB_" + imgName)
 
             tmp = img_src.transpose(Image.ROTATE_90)
-            tmp.save("img/resize/spin90_" + imgName)
+            tmp.save("data/1/spin90_" + imgName)
 
             tmp = img_src.transpose(Image.ROTATE_270)
-            tmp.save("img/resize/spin270_" + imgName)
+            tmp.save("data/1/spin270_" + imgName)
 
             tmp = img_src.transpose(Image.FLIP_LEFT_RIGHT)
-            tmp.save("img/resize/flipLR_" + imgName)
+            tmp.save("data/1/flipLR_" + imgName)
 
             print("{} is done".format(imgName))
 
 if __name__ == '__main__':
-    imgNames = os.listdir("/Users/zero/Desktop/local/study_machine_learning/img/resize_ao")
+    imgNames = os.listdir("/Users/zero/Desktop/local/study_machine_learning/img/aka_seiber")
     print(imgNames)
     spinImg(imgNames)
