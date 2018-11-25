@@ -30,14 +30,15 @@ from chainer.training import triggers
 from chainer.dataset import concat_examples
 
 # img dir
-IMG_DIR = 'animeface-character-dataset/thumb'
+IMG_DIR = './img'#'animeface-character-dataset/thumb'
 
 dnames = glob.glob('{}/*'.format(IMG_DIR))
 
 # img path list
-fnames = [glob.glob('{}/*.png'.format(d)) for d in dnames
+fnames = [glob.glob('{}/*.jpg'.format(d)) for d in dnames
             if not os.path.exists('{}/ignore'.format(d))]
 fnames = list(chain.from_iterable(fnames))
+print("img file name: ",fnames)
 
 # フォルダ名から一意なIDを付与
 labels = [os.path.basename(os.path.dirname(fn)) for fn in fnames]
@@ -135,7 +136,7 @@ optimizer.add_hook(chainer.optimizer.WeightDecay(0.0001))
 updater = training.StandardUpdater(
     train_iter, optimizer, device=gpu_id)
 
-trainer = training.Trainer(updater, (train_epoch, 'epoch'), out='AnimeFace-result')
+trainer = training.Trainer(updater, (train_epoch, 'epoch'), out='Training-model-result')
 trainer.extend(extensions.LogReport())
 trainer.extend(extensions.observe_lr())
 
