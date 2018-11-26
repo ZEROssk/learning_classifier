@@ -29,8 +29,12 @@ from chainer.training import extensions
 from chainer.training import triggers
 from chainer.dataset import concat_examples
 
+import matplotlib.pyplot as plt
+
+from chainer import cuda
+
 # img dir
-IMG_DIR = './img'#'animeface-character-dataset/thumb'
+IMG_DIR = './img'
 
 dnames = glob.glob('{}/*'.format(IMG_DIR))
 
@@ -171,4 +175,22 @@ trainer.extend(
     trigger=(lr_drop_epoch, 'epoch'))
 
 trainer.run()
+
+chainer.config.train = False
+for _ in range(10):
+    x, t = valid[np.random.randint(len(valid))]
+    x = cuda.to_gpu(x)
+    y = F.softmax(model.predictor(x[None, ...]))
+
+    pred = os.path.basename(dnames[int(y.data.argmax())])
+    label = os.path.basename(dnames[t])
+
+    print('pred: ', pred, 'label: ', label, pred == label)
+
+    #x = cuda.to_cpu(x)
+    #x += mean[:, None, None]
+    #x = x / 256
+    #x = np.clip(x, 0, 1)
+    #plt.imshow(x.transpose(1, 2, 0))
+    #plt.show()
 
