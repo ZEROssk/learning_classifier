@@ -1,4 +1,4 @@
-# coding:utf-8
+#coding:utf-8
 
 import os
 import glob
@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 from chainer import cuda
 
 # img dir
-IMG_DIR = './img'
+IMG_DIR = './data'
 
 dnames = glob.glob('{}/*'.format(IMG_DIR))
 
@@ -42,7 +42,7 @@ dnames = glob.glob('{}/*'.format(IMG_DIR))
 fnames = [glob.glob('{}/*.jpg'.format(d)) for d in dnames
             if not os.path.exists('{}/ignore'.format(d))]
 fnames = list(chain.from_iterable(fnames))
-print("img file name: ",fnames)
+print("read img done")
 
 # フォルダ名から一意なIDを付与
 labels = [os.path.basename(os.path.dirname(fn)) for fn in fnames]
@@ -93,6 +93,7 @@ mean = mean.mean(axis=(1, 2))
 
 class Illust2Vec(Chain):
 
+    print("read model done")
     CAFFEMODEL_FN = 'illust2vec_ver200.caffemodel'
 
     def __init__(self, n_classes, unchain=True):
@@ -126,8 +127,8 @@ batchsize = 64
 gpu_id = -1
 initial_lr = 0.01
 lr_drop_epoch = 10
-lr_drop_ratio = 0.1
-train_epoch = 20
+lr_drop_ratio = 1
+train_epoch = 5
 
 train_iter = iterators.MultiprocessIterator(train, batchsize)
 valid_iter = iterators.MultiprocessIterator(
@@ -176,21 +177,24 @@ trainer.extend(
 
 trainer.run()
 
+serializers.save_npz('classifier.model', model)
+
 chainer.config.train = False
 for _ in range(10):
     x, t = valid[np.random.randint(len(valid))]
-    x = cuda.to_gpu(x)
+    x = cuda.to_cpu(x)
     y = F.softmax(model.predictor(x[None, ...]))
 
     pred = os.path.basename(dnames[int(y.data.argmax())])
     label = os.path.basename(dnames[t])
 
+    print(_)
     print('pred: ', pred, 'label: ', label, pred == label)
 
-    #x = cuda.to_cpu(x)
-    #x += mean[:, None, None]
-    #x = x / 256
-    #x = np.clip(x, 0, 1)
+    x = cuda.to_cpu(x)
+    x += mean[:, None, None]
+    x = x / 256
+    x = np.clip(x, 0, 1)
     #plt.imshow(x.transpose(1, 2, 0))
     #plt.show()
 
